@@ -30,7 +30,7 @@ constexpr int MAX_ID_LEN = 50;
 #define FZ_PROXY_MOVE	17
 
 #define MAX_PACKET_SIZE 128
-#define MAX_GATHER_SIZE 10
+#define MAX_GATHER_SIZE 100
 
 
 #pragma pack(push ,1)
@@ -51,7 +51,7 @@ struct sc_packet_put_object {
 	int id;
 	char o_type;
 	short x, y;
-	// ·»´õ¸µ Á¤º¸, Á¾Á·, ¼ºº°, Âø¿ë ¾ÆÀÌÅÛ, Ä³¸¯ÅÍ ¿ÜÇü, ÀÌ¸§, ±æµå....
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½Ì¸ï¿½, ï¿½ï¿½ï¿½....
 };
 
 struct sc_packet_pos {

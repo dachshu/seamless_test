@@ -94,19 +94,22 @@ public:
 	}
 };
 
+
+const unsigned int zone_server_recv_buf_size = (sizeof(int) * 2 + MAX_PACKET_SIZE * MAX_GATHER_SIZE) * 100;
+
 class ZONE_SERVER
 {
 public:
 	int sid;
 	tcp::socket sock{ io_context };
 
-	char recv_buf[sizeof(int) * 2 + MAX_PACKET_SIZE * MAX_GATHER_SIZE];
+	char recv_buf[zone_server_recv_buf_size];
 	int prev_packet_size;
 
 public:
 	void do_read()
 	{
-		sock.async_read_some(boost::asio::buffer(&recv_buf[prev_packet_size], (sizeof(int) * 2 + MAX_PACKET_SIZE * MAX_GATHER_SIZE) - prev_packet_size),
+		sock.async_read_some(boost::asio::buffer(&recv_buf[prev_packet_size], (zone_server_recv_buf_size) - prev_packet_size),
 			[this](boost::system::error_code ec, std::size_t length)
 			{
 				if (ec) {
@@ -119,6 +122,7 @@ public:
 				int remain = length;
 				int packet_size;
 				int prev_p_size = prev_packet_size;
+				int total_packet_size = prev_packet_size + length;
 
 				if (prev_p_size == 0) packet_size = 0;
 				else packet_size = *(reinterpret_cast<int*>(&recv_buf[0]));
@@ -126,10 +130,11 @@ public:
 				while (remain > 0) {
 					if (0 == packet_size) packet_size = *(reinterpret_cast<int*>(&p[0]));
 					int required = packet_size - prev_p_size;
-					if (required <= remain) {
+					if (total_packet_size >= sizeof(int) && required <= remain) {
 						ProcessServerPacket(sid, p);
 						remain -= required;
 						p += packet_size;
+						total_packet_size -= packet_size;
 						prev_p_size = 0;
 						packet_size = 0;
 					}
@@ -207,10 +212,10 @@ bool is_in_boundary(short y)
 
 void send_packet(int id, char* packet, int packet_size)
 {
-	if (false == clients[id].is_connected) {
-		send_buf_pool.return_sendBuffer(packet);
-		return;
-	}
+	//if (false == clients[id].is_connected) {
+	//	send_buf_pool.return_sendBuffer(packet);
+	//	return;
+	//}
 
 	boost::asio::async_write(clients[id].sock,
 		boost::asio::buffer(packet, packet_size),
